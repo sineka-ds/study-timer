@@ -73,11 +73,10 @@ Already in the original:
 - Progress bar
 
 ---
-
 ## What I learned building this
+
 Before this project I had only built frontend React apps. This was the first time I 
 wrote a backend API myself and connected it to a React app using fetch. I learned 
 what CORS is and why it's needed, how POST and GET requests work in practice, and 
 how to save and read data on a server. Seeing the data I saved actually show up in 
 the chart on the dashboard was the moment it all made sense to me.
-I had never connected a React app to a backend I built myself before this. Getting the first fetch POST to actually save data and seeing it appear in the dashboard was the moment things clicked for me. I also learned about CORS, the browser Notification API, and how to structure a simple REST API.
