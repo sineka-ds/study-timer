@@ -1,111 +1,83 @@
-#  Study Room Focus Timer
+# Study Room Focus Timer
 
-A full-stack productivity app built with React and Node.js that helps you study smarter using the Pomodoro technique — with session tracking, subject labels, and a analytics dashboard.
+A pomodoro timer app I extended with a full backend, session tracking, and a study dashboard.
 
-> Forked from [dimples-app/Pomodoro-Timer](https://github.com/dimples-app/Pomodoro-Timer) and extended with 3 original features.
+The base project was a frontend-only React timer with no data persistence. I forked it and added the backend and analytics features myself.
 
----
-
-##  What I Built On Top
-
-The original project was a basic timer with no backend. I added:
-
-### 1.  Session History Dashboard
-- Built a Node.js + Express REST API from scratch
-- Every completed session is saved automatically
-- Bar chart shows study minutes per day using Chart.js
-- Data stays saved even after closing the browser
-
-### 2.  Subject Labels Per Session
-- Added a text input above the timer
-- User types what they are studying before starting
-- Each session saved with its subject name
-- Dashboard shows total time spent per subject
-
-### 3.  Browser Notification + Sound Alert
-- Desktop notification fires when session ends
-- Sound plays using the Web Audio API
-- Works even when browser tab is in background
-- No external library needed
+Live base repo: [dimples-app/Pomodoro-Timer](https://github.com/dimples-app/Pomodoro-Timer)
 
 ---
 
-##  Tech Stack
+## What I added
 
-| Layer | Technology |
-|-------|------------|
-| Frontend | React 16, React Router v5 |
-| Charts | Chart.js, react-chartjs-2 |
-| Backend | Node.js, Express |
-| Data Storage | JSON file via fs module |
-| Styling | Custom CSS |
+The original app had a countdown timer, break controls, and a basic task list. Nothing was saved — refresh the page and everything was gone.
+
+I added three things:
+
+**Session history dashboard**
+Built a Node/Express API that saves every completed focus session to a JSON file. A new dashboard page pulls that data and shows a bar chart of study minutes per day using Chart.js.
+
+**Subject tracking**
+Added a text input above the timer where you type what you are studying. That label gets saved with each session, so the dashboard can show you how much time you spent on each subject.
+
+**Browser notifications**
+When the timer hits zero, the app sends a desktop notification and plays a short sound using the Web Audio API. No library needed — just the browser's built-in APIs.
 
 ---
 
-##  How to Run Locally
+## Tech used
 
-**1. Clone the repo**
+- React 16, React Router v5
+- Node.js, Express
+- Chart.js, react-chartjs-2
+- CSS
+
+---
+
+## Running locally
+
+You need two terminals.
+
+Terminal 1 — frontend:
 ```bash
-git clone https://github.com/YOUR-USERNAME/study-timer
+git clone https://github.com/sineka-ds/study-timer
 cd study-timer
-```
-
-**2. Start the frontend**
-```bash
 npm install
 npm start
 ```
 
-**3. Start the backend in a new terminal**
+Terminal 2 — backend:
 ```bash
 cd server
 npm install
 node index.js
 ```
 
-**4. Open your browser**
-http://localhost:3000/Pomodoro-Timer
+Open `http://localhost:3000/Pomodoro-Timer` in your browser.
 
 ---
 
-##  Folder Structure
-## What I Added vs What Was Already There
+## What I wrote vs what was already there
 
-**Already in the original project:**
-- Timer countdown (focus + break)
-- Duration controls (+ / - buttons)
-- Basic task list
+I wrote:
+- `server/index.js` — the entire backend API
+- `src/Dashboard.jsx` — the dashboard and chart page
+- Subject input and session save logic in `Pomodoro.js`
+- Notification and sound code
+- All the CSS theming
+
+Already in the original:
+- Timer countdown logic
+- Focus and break duration controls
+- Task list
 - Progress bar
 
-**I built these from scratch:**
-- `server/index.js` — Node.js REST API with GET and POST routes
-- `server/sessions.json` — data storage for all sessions
-- `src/Dashboard.jsx` — full dashboard page with chart
-- Subject input field in the timer
-- Browser notification and sound when session ends
-- Navigation between Timer and Dashboard pages
-
 ---
 
-##  What I Learned
-
-- Building a REST API with Node.js and Express
-- Connecting React frontend to a backend with fetch
-- Persisting data without a database using JSON files
-- Data visualization with Chart.js
-- Multi-page navigation with React Router
-- Browser Notification API and Web Audio API
-
----
-
-##  Original Project
-
-Base project by [dimples-app](https://github.com/dimples-app/Pomodoro-Timer).
-
-My contributions: `server/` folder, `src/Dashboard.jsx`, subject input in `Pomodoro.js`, notification and sound logic, CSS theming.
-
-
-
-```
-
-**4. Open your browser**
+## What I learned building this
+Before this project I had only built frontend React apps. This was the first time I 
+wrote a backend API myself and connected it to a React app using fetch. I learned 
+what CORS is and why it's needed, how POST and GET requests work in practice, and 
+how to save and read data on a server. Seeing the data I saved actually show up in 
+the chart on the dashboard was the moment it all made sense to me.
+I had never connected a React app to a backend I built myself before this. Getting the first fetch POST to actually save data and seeing it appear in the dashboard was the moment things clicked for me. I also learned about CORS, the browser Notification API, and how to structure a simple REST API.
