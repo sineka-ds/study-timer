@@ -5,58 +5,35 @@ import DurationFocus from "./DurationFocus";
 import TimeControl from "./TimeControl";
 import Progress from "./Progress";
 import ToDo from "./ToDo";
-/**
- * 
- * @returns function for Pomodoro
- */
+
 function Pomodoro() {
-  // Timer starts out paused
   const [isTimerRunning, setIsTimerRunning] = useState(false);
-
-  const [focusDuration, setFocusDuration] = useState(25); // in minute
-  const [breakDuration, setBreakDuration] = useState(5); //in minute
-
-  // adjust session active default to inactive
+  const [focusDuration, setFocusDuration] = useState(25);
+  const [breakDuration, setBreakDuration] = useState(5);
   const [isSessionActive, setIsSessionActive] = useState(false);
-
-  //adjust pause default to pause
   const [isSessionPause, setIsSessionPause] = useState(true);
-
-  //set up timer remaining
-  const [timer, setTimer] = useState(1500); //in second
-
-  // current session default to "Focus"
+  const [timer, setTimer] = useState(1500);
   const [currentState, setCurrentState] = useState("focus");
 
-  // handle increment on focus
+  // YOUR ADDITION — subject input state
+  const [subject, setSubject] = useState("");
+
   const handleFocusIncrement = () => {
-    setFocusDuration((currentValue) => {
-      return Math.min(60, currentValue + 5);
-    });
+    setFocusDuration((currentValue) => Math.min(60, currentValue + 5));
   };
 
-  //handle decrement on focus
   const handleFocusDecrement = () => {
-    setFocusDuration((currentValue) => {
-      return Math.max(5, currentValue - 5);
-    });
+    setFocusDuration((currentValue) => Math.max(5, currentValue - 5));
   };
 
-  //handle inrement on break
   const handleBreakIncrement = () => {
-    setBreakDuration((currentValue) => {
-      return Math.min(15, currentValue + 1);
-    });
+    setBreakDuration((currentValue) => Math.min(15, currentValue + 1));
   };
 
-  //handle decrement on break
   const handleBreakDecrement = () => {
-    setBreakDuration((currentValue) => {
-      return Math.max(1, currentValue - 1);
-    });
+    setBreakDuration((currentValue) => Math.max(1, currentValue - 1));
   };
 
-  //handle stop button
   const handleStopButton = () => {
     setIsSessionActive(false);
     setIsTimerRunning(false);
@@ -64,18 +41,47 @@ function Pomodoro() {
     setCurrentState("focus");
   };
 
+  // YOUR ADDITION — save session to backend
+  const saveSession = () => {
+    fetch("http://localhost:5000/api/sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        subject: subject || "General",
+        duration: focusDuration,
+      }),
+    }).catch(() => console.log("Could not save session — is backend running?"));
+  };
+
+  // YOUR ADDITION — browser notification + sound
+  const notifyUser = () => {
+    if (Notification.permission === "granted") {
+      new Notification("Session complete!", {
+        body: "Great work! Time for a break.",
+      });
+    }
+    try {
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      osc.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
+    } catch (e) {}
+  };
+
   useInterval(
     () => {
       if (timer === 0) {
         new Audio("https://bigsoundbank.com/UPLOAD/mp3/1482.mp3").play();
 
-        const newTime =
-          currentState === "focus" ? breakDuration : focusDuration;
+        // YOUR ADDITION — save + notify only when focus session ends
+        if (currentState === "focus") {
+          saveSession();
+          notifyUser();
+        }
 
-        // set up breakDuration / focusDuration in second
+        const newTime = currentState === "focus" ? breakDuration : focusDuration;
         setTimer(newTime * 60);
-
-        // switching session focus /  Break
         setCurrentState((prevState) =>
           prevState === "focus" ? "break" : "focus"
         );
@@ -90,14 +96,35 @@ function Pomodoro() {
     if (!isSessionActive) {
       setIsSessionActive(true);
       setTimer(focusDuration * 60);
+      // YOUR ADDITION — request notification permission when session starts
+      Notification.requestPermission();
     }
     setIsSessionPause((prevState) => !prevState);
-
     setIsTimerRunning((prevState) => !prevState);
   }
 
   return (
     <div className="pomodoro">
+
+      {/* YOUR ADDITION — subject input */}
+      <div className="row" style={{ justifyContent: "center", marginBottom: "10px" }}>
+        <input
+          type="text"
+          placeholder="What are you studying? (e.g. React, Math)"
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+          disabled={isSessionActive}
+          style={{
+            padding: "8px 16px",
+            width: "60%",
+            borderRadius: "8px",
+            border: "1px solid #ccc",
+            fontSize: "14px",
+            textAlign: "center",
+          }}
+        />
+      </div>
+
       <div className="row">
         <div className="col">
           <DurationFocus
@@ -146,4 +173,3 @@ function Pomodoro() {
 }
 
 export default Pomodoro;
-
